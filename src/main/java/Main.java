@@ -24,14 +24,14 @@ public class Main{
 
 
 
-
-    private static void run() {
+    @SuppressWarnings("InfiniteLoopStatement")
+    static void run() {
         while(true){
             runProgramLogic();
         }
     }
 
-    private static void runProgramLogic() {
+    static void runProgramLogic() {
         userInput();
 
         if(returnTotalPriceOfItems() == 0) {
@@ -50,14 +50,14 @@ public class Main{
         }
     }
 
-    private static void userInput() {
+    static void userInput() {
         MenuDisplay.itemsToPurchase();
         String userInput = scanner.nextLine();
         userInputSplit = userInput.trim().split(",");
     }
 
 
-    public static double returnTotalPriceOfItems() {
+    static double returnTotalPriceOfItems() {
         double finalTotalPrice = 0.0;
         for (String firstLetter : userInputSplit) {
             for (Product product : productList) {
@@ -66,24 +66,27 @@ public class Main{
                 }
             }
         }
+
         return finalTotalPrice;
     }
 
-    private static boolean isMatchAndHasStock(String firstLetter, Product product) {
+    static boolean isMatchAndHasStock(String firstLetter, Product product) {
+
         return firstLetter.equals(product.getFirstLetterOfProduct()) && product.checkIfEnoughStock();
     }
 
-    public static void moneyToReturn(double finalTotalPrice, double userPaidMoney) {
+    static void moneyToReturn(double finalTotalPrice, double userPaidMoney) {
         double returnAmount = userPaidMoney - finalTotalPrice;
         if (returnAmount > 0) {
             MenuDisplay.amountToReturnPrint(returnAmount);
             changeStockAmounts();
+
             return;
         }
         MenuDisplay.notEnoughMoney();
     }
 
-    public static void changeStockAmounts() {
+    static void changeStockAmounts() {
         for (String firstLetter : userInputSplit) {
             for (Product product : productList) {
                 if (isMatchAndHasStock(firstLetter, product)) {
