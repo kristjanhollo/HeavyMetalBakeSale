@@ -28,16 +28,5 @@ public class Product {
         return this.productName.substring(0,1);
     }
 
-    public int getProductStock() {
-        return productStock;
-    }
 
-    @Override
-    public String toString() {
-        return "Product{" +
-                "productName='" + productName + '\'' +
-                ", productPrice=" + productPrice +
-                ", productStock=" + productStock +
-                '}';
-    }
 }

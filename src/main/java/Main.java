@@ -8,7 +8,6 @@ import java.util.Scanner;
 public class Main{
     static Scanner scanner = new Scanner(System.in);
     static List<Product> productList = new ArrayList<>();
-    static String[] userInputSplit;
 
     static {
         productList.add(new Product("Brownie", 0.65, 48));
@@ -17,49 +16,50 @@ public class Main{
         productList.add(new Product("Water", 1.5, 30));
     }
 
-
-    public static void main(String[] args) {
-        run();
-    }
-
-
-
     @SuppressWarnings("InfiniteLoopStatement")
-    static void run() {
+    public static void main(String[] args) {
         while(true){
             runProgramLogic();
         }
     }
 
-    static void runProgramLogic() {
-        userInput();
 
-        if(returnTotalPriceOfItems() == 0) {
+    private static void runProgramLogic() {
+        MenuDisplay.itemsToPurchase();
+
+        String[] splitUserInput = getUserInputAndSplit();
+
+        if(getTotalPriceOfProducts(splitUserInput) == 0) {
             MenuDisplay.notEnoughStock();
         } else {
-            MenuDisplay.totalItemsPrice(returnTotalPriceOfItems());
+            MenuDisplay.totalItemsPrice(getTotalPriceOfProducts(splitUserInput));
             MenuDisplay.amountPaid();
-            double userPaidMoney;
-            try {
-                userPaidMoney = Double.parseDouble(scanner.nextLine());
-            } catch (NumberFormatException numberFormatException) {
-                userPaidMoney = 0.0;
-            }
-            moneyToReturn(returnTotalPriceOfItems(), userPaidMoney);
+
+            String userMoneyInput = scanner.nextLine();
+            double userPaidMoney = getUserPaidMoney(userMoneyInput);
+            getAmountToReturn(getTotalPriceOfProducts(splitUserInput), userPaidMoney, splitUserInput);
 
         }
     }
 
-    static void userInput() {
-        MenuDisplay.itemsToPurchase();
-        String userInput = scanner.nextLine();
-        userInputSplit = userInput.trim().split(",");
+    private static double getUserPaidMoney(String userMoneyPaid) {
+        try {
+            return Double.parseDouble(userMoneyPaid);
+        } catch (NumberFormatException numberFormatException) {
+            return  0.0;
+        }
     }
 
 
-    static double returnTotalPriceOfItems() {
+    private static String[] getUserInputAndSplit() {
+        String userInput = scanner.nextLine();
+        return userInput.trim().split(",");
+    }
+
+
+    private static double getTotalPriceOfProducts(String[] splitUserInput) {
         double finalTotalPrice = 0.0;
-        for (String firstLetter : userInputSplit) {
+        for (String firstLetter : splitUserInput) {
             for (Product product : productList) {
                 if (isMatchAndHasStock(firstLetter, product)) {
                     finalTotalPrice += product.getProductPrice();
@@ -70,24 +70,31 @@ public class Main{
         return finalTotalPrice;
     }
 
-    static boolean isMatchAndHasStock(String firstLetter, Product product) {
+    private static boolean isMatchAndHasStock(String firstLetter, Product product) {
 
         return firstLetter.equals(product.getFirstLetterOfProduct()) && product.checkIfEnoughStock();
     }
 
-    static void moneyToReturn(double finalTotalPrice, double userPaidMoney) {
-        double returnAmount = userPaidMoney - finalTotalPrice;
-        if (returnAmount > 0) {
-            MenuDisplay.amountToReturnPrint(returnAmount);
-            changeStockAmounts();
 
-            return;
+    private static void getAmountToReturn(double finalTotalPrice, double userPaidMoney, String[] splitUserInput) {
+        double returnAmount = getReturnAmount(finalTotalPrice, userPaidMoney);
+        if (isEnoughMoney(returnAmount)) {
+            MenuDisplay.amountToReturnPrint(returnAmount);
+            changeStockAmounts(splitUserInput);
         }
         MenuDisplay.notEnoughMoney();
     }
 
-    static void changeStockAmounts() {
-        for (String firstLetter : userInputSplit) {
+    private static boolean isEnoughMoney(double returnAmount) {
+        return returnAmount > 0;
+    }
+
+    private static double getReturnAmount(double finalTotalPrice, double userPaidMoney) {
+        return userPaidMoney - finalTotalPrice;
+    }
+
+    private static void changeStockAmounts(String[] splitUserInput) {
+        for (String firstLetter : splitUserInput) {
             for (Product product : productList) {
                 if (isMatchAndHasStock(firstLetter, product)) {
                     product.updateProductStock();
